@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TSP.Console.Common;
 
 namespace TSP.Console.Files
 {
@@ -12,7 +13,7 @@ namespace TSP.Console.Files
         public string Type { get; set; }
         public string Comment { get; set; }
         public string Dimension { get; set; }
-        public string EdgeWeightType { get; set; }
+        public EdgeWeightTypeEnum EdgeWeightType { get; set; }
         //TODO nodes
     }
 }
