@@ -8,6 +8,11 @@ namespace TSP.Console.Files
 {
     public class TSPLIBData
     {
-        //TODO
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Comment { get; set; }
+        public string Dimension { get; set; }
+        public string EdgeWeightType { get; set; }
+        //TODO nodes
     }
 }

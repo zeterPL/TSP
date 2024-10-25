@@ -2,4 +2,4 @@
 
 Console.WriteLine("Hello, World!");
 
-TSPLIBData data = TSPLIBImporter.Import("/test/test.isplib");
+TSPLIBData data = TSPLIBImporter.Import("/Input/berlin52.tsp");
