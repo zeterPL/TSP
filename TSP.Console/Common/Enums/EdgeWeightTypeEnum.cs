@@ -8,6 +8,7 @@ namespace TSP.Console.Common
 {
     public enum EdgeWeightTypeEnum
     {
+        NONE,
         EXPLICIT,
         EUC_2D,
         EUC_3D,

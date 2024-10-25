@@ -1,5 +1,8 @@
 ﻿using TSP.Console.Files;
 
-Console.WriteLine("Hello, World!");
+string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+string filePath = Path.Combine(projectDirectory, "Input", "berlin52.tsp");
 
-TSPLIBData data = TSPLIBImporter.Import("/Input/berlin52.tsp");
+TSPLIBData data = TSPLIBImporter.Import(filePath);
+
+Console.WriteLine(data);
