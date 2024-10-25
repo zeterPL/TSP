@@ -6,7 +6,7 @@ Algorytm genetyczny dla problemu komiwojażera
 - [ ]  Algorytm
   - [ ] Dwa oparatory krzyżowe
 - [ ] Wczytywanie plików
-  - [ ] Podstawowe wczytywanie
+  - [X] Podstawowe wczytywanie
   - [ ] Rozróżnienie metod zapisu węzłów podczas importu
 - [ ] Dodatkow
   - [ ] Trzeci operator krzyżowy
