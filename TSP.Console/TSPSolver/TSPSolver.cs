@@ -25,14 +25,18 @@ namespace TSP.Console.TSPSolver
             int nodesCount = nodes.Count;
             double[,] distanceMatrix = new double[nodesCount, nodesCount];
 
-            for (int i = 0; i < nodesCount; i++)
+            foreach (var city1 in nodes)
             {
-                for (int j = 0; j < nodesCount; j++)
+                foreach (var city2 in nodes)
                 {
-                    if (i == j) distanceMatrix[i, j] = 0;
+                    int index1 = city1.Id - 1;
+                    int index2 = city2.Id - 1;
+
+                    if (index1 == index2) distanceMatrix[index1, index2] = 0; 
+
                     else
                     {
-                        distanceMatrix[i, j] = CalculateEuclidesDistance(nodes[i], nodes[j]);
+                        distanceMatrix[index1, index2] = CalculateEuclidesDistance(city1, city2);
                     }
                 }
             }
