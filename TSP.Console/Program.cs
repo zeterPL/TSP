@@ -14,4 +14,4 @@ ITSPSolver solver = new TSPSolver();
 
 double[,] distanceMatrix = solver.CalculateDistanceMatrix(data.Nodes);
 
-distanceMatrix.PrintMatrix();
+distanceMatrix.PrintMatrix(10);
