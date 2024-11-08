@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TSP.Console.Files.Importer;
 
 namespace TSP.Console.Files
 {
@@ -11,7 +10,12 @@ namespace TSP.Console.Files
     {
         public static TSPLIBData Import(string path)
         {
-            throw new NotImplementedException();
+            var lines = File.ReadAllLines(path);
+
+            foreach(var line in lines)
+            {
+
+            }
         }
     }
 }
