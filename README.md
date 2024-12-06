@@ -4,16 +4,41 @@ Algorytm genetyczny dla problemu komiwojażera
 
 ![Wzrór na odległość](https://github.com/user-attachments/assets/95f6ec69-760b-4dba-83d0-68eea74657fd)
 
+### Zrealizowane
 
-### TODO
-- [ ]  Algorytm
-  - [ ] Macierz odległości
-  - [ ] Dwa oparatory krzyżowe
-- [ ] Wczytywanie plików
-  - [X] Podstawowe wczytywanie
-  - [ ] Rozróżnienie metod zapisu węzłów podczas importu
-- [ ] Dodatkow
-  - [ ] Trzeci operator krzyżowy
-  - [ ] Własny generator znaków losowych i porównanie z heursytyką 2-opt
-  - [ ] Algorytm memetyczny ( heurystykę 3-opt lub heurystykę LK)
-       
+- **Wczytywanie danych w formacie TSPLIB**:  
+  Zaimportowano plik TSPLIB, wczytywane są dane o miastach (współrzędne), tworzona jest macierz odległości.
+
+- **Algorytm genetyczny z reprezentacją permutacyjną**:  
+  Zaimplementowany algorytm genetyczny operujący na permutacji miast, uwzględniający populację, selekcję turniejową, krzyżowanie i mutację.
+
+- **Operator mutacji (swap)**:  
+  Dodano prostą mutację polegającą na zamianie dwóch losowych miast w chromosomie.
+
+- **Operator krzyżowania PMX**:  
+  Krzyżowanie PMX.
+
+### Do zrobienia
+
+- **Dodatkowe operatory krzyżowania**:
+
+  - Implementacja drugiego operatora krzyżowania (np. OX).
+  - Implementacja trzeciego operatora krzyżowania (np. CX), aby spełnić wymagania i zdobyć dodatkowe punkty.
+
+- **Generator grafów losowych i porównanie z heurystyką 2-opt**:
+
+  - Stworzyć generator losowej instancji TSP (losowe położenie miast).
+  - Zaimplementować heurystykę 2-opt.
+  - Porównać wyniki GA z wynikami 2-opt na wygenerowanych instancjach.
+
+- **Algorytm memetyczny (lokalna optymalizacja nowych rozwiązań)**:
+  - Po każdym krzyżowaniu i mutacji, zastosować lokalną optymalizację (np. 2-opt) do poprawienia rozwiązania.
+  - Opcjonalnie (dodatkowe punkty): zastąpić 2-opt bardziej zaawansowaną heurystyką (3-opt lub Lin-Kernighan) w algorytmie memetycznym.
+
+### Bonusowe
+
+- **3-opt (lokalna optymalizacja)**:  
+  Wprowadzić 3-opt jako ulepszenie w algorytmie memetycznym (+10 pkt).
+
+- **Lin-Kernighan (LK)**:  
+  Wprowadzić heurystykę Lin-Kernighan w algorytmie memetycznym (+15 pkt).

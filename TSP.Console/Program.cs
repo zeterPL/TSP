@@ -1,6 +1,6 @@
 ﻿using TSP.Console.Common.Extensions;
 using TSP.Console.Files;
-using TSP.Console.Interfaces;
+using TSP.Console.Solver;
 using TSP.Console.TSPSolver;
 
 string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
@@ -10,8 +10,19 @@ TSPLIBData data = TSPLIBImporter.Import(filePath);
 
 Console.WriteLine(data);
 
-ITSPSolver solver = new TSPSolver();
-
-double[,] distanceMatrix = solver.CalculateDistanceMatrix(data.Nodes);
+double[,] distanceMatrix = Helpers.CalculateDistanceMatrix(data.Nodes);
 
 distanceMatrix.PrintMatrix(10);
+
+GeneticTSPSolver gaSolver = new GeneticTSPSolver(
+            distanceMatrix: distanceMatrix,
+            populationSize: 100,
+            mutationRate: 0.05,
+            crossoverRate: 0.9,
+            maxGenerations: 1000
+        );
+
+Chromosome bestSolution = gaSolver.Solve();
+
+Console.WriteLine("Najlepsze rozwiązanie:");
+Console.WriteLine(bestSolution);
