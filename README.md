@@ -22,7 +22,7 @@ Algorytm genetyczny dla problemu komiwojażera
 
 - **Dodatkowe operatory krzyżowania**:
 
-  - Implementacja drugiego operatora krzyżowania (np. OX).
+  - Implementacja drugiego operatora krzyżowania (np. OX). - WYMAGANE
   - Implementacja trzeciego operatora krzyżowania (np. CX), aby spełnić wymagania i zdobyć dodatkowe punkty.
 
 - **Generator grafów losowych i porównanie z heurystyką 2-opt**:
