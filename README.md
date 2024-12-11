@@ -18,8 +18,8 @@ Algorytm genetyczny dla problemu komiwojażera
 - **Operator krzyżowania PMX**:  
   Krzyżowanie PMX.
 
-- **Implementacja drugiego operatora krzyżowania - OX**:
-  Krzyżowanie OX, operator wybierany losowo 
+- **Implementacja drugiego operatora krzyżowania OX**:
+   Krzyżowanie OX, operator wybierany losowo.
 
 ### Do zrobienia
 
