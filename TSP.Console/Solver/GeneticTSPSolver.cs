@@ -91,9 +91,14 @@ namespace TSP.Console.Solver
                     Chromosome offspring;
 
                     if (random.NextDouble() < crossoverRate)
-                        offspring = PMX(parent1, parent2);
+                    {
+                        // Losowanie operatora krzyżowania
+                        offspring = random.Next(2) == 0 ? PMX(parent1, parent2) : OX(parent1, parent2);
+                    }
                     else
+                    {
                         offspring = parent1.Clone();
+                    }
 
                     offspring = Mutate(offspring);
 
@@ -157,12 +162,7 @@ namespace TSP.Console.Solver
 
         /// <summary>
         /// Operator krzyżowania PMX (Partially Mapped Crossover).
-        /// Tworzy potomka z dwóch rodziców poprzez odwzorowanie fragmentu genów z jednego rodzica
-        /// i uzupełnienie brakujących elementów na podstawie drugiego.
         /// </summary>
-        /// <param name="parent1">Chromosom rodzic 1.</param>
-        /// <param name="parent2">Chromosom rodzic 2.</param>
-        /// <returns>Nowy chromosom potomny.</returns>
         private Chromosome PMX(Chromosome parent1, Chromosome parent2)
         {
             int length = parent1.Route.Length;
@@ -194,7 +194,6 @@ namespace TSP.Console.Solver
                     int pos = i;
                     int mappedGene = parent1.Route[pos];
 
-                    // Dopóki miejsce jest zajęte, mapujemy dalej
                     while (child[pos] != -1)
                     {
                         pos = Array.IndexOf(parent2.Route, mappedGene);
@@ -205,7 +204,6 @@ namespace TSP.Console.Solver
                 }
             }
 
-            // Uzupełniamy pozostałe puste miejsca genami z parent2
             for (int i = 0; i < length; i++)
             {
                 if (child[i] == -1)
@@ -218,10 +216,48 @@ namespace TSP.Console.Solver
         }
 
         /// <summary>
+        /// Operator krzyżowania OX (Order Crossover).
+        /// </summary>
+        private Chromosome OX(Chromosome parent1, Chromosome parent2)
+        {
+            int length = parent1.Route.Length;
+            int[] child = new int[length];
+            for (int i = 0; i < length; i++)
+                child[i] = -1;
+
+            int start = random.Next(length);
+            int end = random.Next(length);
+            if (start > end)
+            {
+                int temp = start;
+                start = end;
+                end = temp;
+            }
+
+            // Kopiujemy segment z parent1 do dziecka
+            for (int i = start; i <= end; i++)
+            {
+                child[i] = parent1.Route[i];
+            }
+
+            // Uzupełniamy pozostałe geny zgodnie z kolejnością z parent2
+            int currentIndex = (end + 1) % length;
+            for (int i = 0; i < length; i++)
+            {
+                int gene = parent2.Route[(end + 1 + i) % length];
+                if (!child.Contains(gene))
+                {
+                    child[currentIndex] = gene;
+                    currentIndex = (currentIndex + 1) % length;
+                }
+            }
+
+            return new Chromosome(child, distanceMatrix);
+        }
+
+        /// <summary>
         /// Operator mutacji zamieniający miejscami dwa losowo wybrane miasta w trasie.
         /// </summary>
-        /// <param name="chromosome">Chromosom do zmutowania.</param>
-        /// <returns>Zmodyfikowany chromosom po mutacji lub oryginalny, jeśli mutacja nie zaszła.</returns>
         private Chromosome Mutate(Chromosome chromosome)
         {
             if (random.NextDouble() < mutationRate)

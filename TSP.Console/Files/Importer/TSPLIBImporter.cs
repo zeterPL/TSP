@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TSP.Console.Common;
+﻿using TSP.Console.Common;
 using TSP.Console.Common.Exceptions;
 using TSP.Console.Files.Importer;
 
@@ -28,14 +23,13 @@ namespace TSP.Console.Files
 
                     var key = parts[0].Trim();
                     var value = "";
+
                     if (parts.Length == 2)
                     {
                         key = parts[0].Trim();
                         value = parts[1].Trim();
                     }
-
-                    
-
+                
                     switch (key)
                     {
                         case "NAME":
