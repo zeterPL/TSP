@@ -20,7 +20,7 @@ GeneticTSPSolver gaSolver = new GeneticTSPSolver(
             populationSize: 100,
             mutationRate: 0.05,
             crossoverRate: 0.9,
-            maxGenerations: 1000
+            maxGenerations: 1000,
             CrossoverMethodEnum.PMX       
         );
 
