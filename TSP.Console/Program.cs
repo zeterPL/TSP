@@ -8,11 +8,11 @@ string filePath = Path.Combine(projectDirectory, "Input", "berlin52.tsp");
 
 TSPLIBData data = TSPLIBImporter.Import(filePath);
 
-Console.WriteLine(data);
+//Console.WriteLine(data);
 
 double[,] distanceMatrix = Helpers.CalculateDistanceMatrix(data.Nodes);
 
-distanceMatrix.PrintMatrix(10);
+//distanceMatrix.PrintMatrix(10);
 
 GeneticTSPSolver gaSolver = new GeneticTSPSolver(
             distanceMatrix: distanceMatrix,

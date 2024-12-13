@@ -102,8 +102,8 @@ namespace TSP.Console.Solver
 
                     offspring = Mutate(offspring);
 
-                    // Tu można dodać lokalną optymalizację (np. 2-opt, 3-opt, LK)
-                    // offspring = LocalSearch.Improve(offspring);
+                    // Dodanie lokalnej optymalizacji 3-opt
+                    offspring = ThreeOptImprove(offspring);
 
                     newPopulation.Add(offspring);
                 }
@@ -274,6 +274,157 @@ namespace TSP.Console.Solver
             }
 
             return chromosome;
+        }
+
+        /// <summary>
+        /// Próbuje poprawić rozwiązanie za pomocą operatora 3-opt.
+        /// </summary>
+        private Chromosome ThreeOptImprove(Chromosome chromosome)
+        {
+            int[] route = (int[])chromosome.Route.Clone();
+            bool improvement = true;
+
+            double bestDistance = chromosome.Distance;
+            while (improvement)
+            {
+                improvement = false;
+                // Przeszukujemy wszystkie trójki krawędzi
+                for (int i = 0; i < numberOfCities - 2; i++)
+                {
+                    for (int j = i + 1; j < numberOfCities - 1; j++)
+                    {
+                        for (int k = j + 1; k < numberOfCities; k++)
+                        {
+                            // Próbujemy wszystkie warianty 3-opt
+                            // Segmenty: (i,j), (j,k)
+                            double oldDist = CalcDistanceOfRouteSegment(route, i, i + 1) +
+                                             CalcDistanceOfRouteSegment(route, j, j + 1) +
+                                             CalcDistanceOfRouteSegment(route, k, (k + 1) % numberOfCities);
+
+                            // Cztery możliwości 3-opt (skrótowo prezentowane)
+                            // 1) odwrócić segment (i+1 do j)
+                            double gain = Try3OptMove(route, i, j, k, 1);
+                            if (gain < 0)
+                            {
+                                bestDistance += gain;
+                                improvement = true;
+                                break;
+                            }
+
+                            // 2) odwrócić segment (j+1 do k)
+                            gain = Try3OptMove(route, i, j, k, 2);
+                            if (gain < 0)
+                            {
+                                bestDistance += gain;
+                                improvement = true;
+                                break;
+                            }
+
+                            // 3) odwrócić oba segmenty
+                            gain = Try3OptMove(route, i, j, k, 3);
+                            if (gain < 0)
+                            {
+                                bestDistance += gain;
+                                improvement = true;
+                                break;
+                            }
+
+                            // 4) inna rekoneksja 3-opt
+                            gain = Try3OptMove(route, i, j, k, 4);
+                            if (gain < 0)
+                            {
+                                bestDistance += gain;
+                                improvement = true;
+                                break;
+                            }
+                        }
+                        if (improvement) break;
+                    }
+                    if (improvement) break;
+                }
+            }
+            return new Chromosome(route, distanceMatrix);
+        }
+
+        /// <summary>
+        /// Oblicza odległość krawędzi między route[pos] a route[nextPos], biorąc pod uwagę wrap-around.
+        /// </summary>
+        private double CalcDistanceOfRouteSegment(int[] route, int posA, int posB)
+        {
+            return distanceMatrix[route[posA], route[posB]];
+        }
+
+        /// <summary>
+        /// Przeprowadza próbę zastosowania ruchu 3-opt i zwraca "zysk" (ujemny, jeśli poprawiono).
+        /// Parametr moveType określa wariant odwracania segmentów.
+        /// </summary>
+        private double Try3OptMove(int[] route, int i, int j, int k, int moveType)
+        {
+            // Kopia oryginalnej trasy
+            int[] newRoute = (int[])route.Clone();
+            switch (moveType)
+            {
+                case 1:
+                    // Odwracamy segment (i+1, j)
+                    ReverseSegment(newRoute, i + 1, j);
+                    break;
+                case 2:
+                    // Odwracamy segment (j+1, k)
+                    ReverseSegment(newRoute, j + 1, k);
+                    break;
+                case 3:
+                    // Odwracamy segment (i+1, j) i (j+1, k)
+                    ReverseSegment(newRoute, i + 1, j);
+                    ReverseSegment(newRoute, j + 1, k);
+                    break;
+                case 4:
+                    // Odwracamy segment (i+1, k)
+                    ReverseSegment(newRoute, i + 1, k);
+                    break;
+                default:
+                    break;
+            }
+
+            double newDist = CalcTotalDistance(newRoute);
+            double oldDist = CalcTotalDistance(route);
+            double gain = newDist - oldDist;
+
+            if (gain < 0)
+            {
+                // Jeśli zysk jest ujemny (czyli lepsza trasa), to aktualizujemy oryginał
+                Array.Copy(newRoute, route, route.Length);
+            }
+
+            return gain;
+        }
+
+        /// <summary>
+        /// Odwraca segment tablicy route od start do end.
+        /// </summary>
+        private void ReverseSegment(int[] route, int start, int end)
+        {
+            while (start < end)
+            {
+                int temp = route[start];
+                route[start] = route[end];
+                route[end] = temp;
+                start++;
+                end--;
+            }
+        }
+
+        /// <summary>
+        /// Liczy całkowitą odległość trasy.
+        /// </summary>
+        private double CalcTotalDistance(int[] route)
+        {
+            double dist = 0;
+            for (int i = 0; i < route.Length; i++)
+            {
+                int next = (i + 1) % route.Length;
+                dist += distanceMatrix[route[i], route[next]];
+            }
+            return dist;
         }
 
         #endregion
