@@ -18,7 +18,7 @@ namespace TSP.Console.TSPSolver
                     int index1 = city1.Id - 1;
                     int index2 = city2.Id - 1;
 
-                    if (index1 == index2) distanceMatrix[index1, index2] = 0;
+                    if (index1 == index2) distanceMatrix[index1, index2] = int.MaxValue;
 
                     else
                     {
