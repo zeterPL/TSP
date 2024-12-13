@@ -166,6 +166,9 @@ namespace TSP.Console.Solver
 
         #region Helpers
 
+        /// <summary>
+        /// Wypisuje metrukę algorytmu zawietającą informację o parametrach konfiguracyjnych
+        /// </summary>
         public void PrintAlgorithmMetrics()
         {
             System.Console.WriteLine("=== Genetic TSP Algorithm ===");
