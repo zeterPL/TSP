@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TSP.Console.Common.Enums;
 
 namespace TSP.Console.Solver
 {
@@ -41,7 +42,15 @@ namespace TSP.Console.Solver
         /// </summary>
         private readonly int maxGenerations;
 
+        /// <summary>
+        /// Random
+        /// </summary>
         private readonly Random random = new Random();
+
+        /// <summary>
+        /// Wybrana metoda krzyżowania
+        /// </summary>
+        CrossoverMethodEnum CrossoverMethod { get; set; }
 
         /// <summary>
         /// Inicjalizuje solver algorytmu genetycznego dla TSP.
@@ -51,7 +60,14 @@ namespace TSP.Console.Solver
         /// <param name="mutationRate">Prawdopodobieństwo mutacji.</param>
         /// <param name="crossoverRate">Prawdopodobieństwo krzyżowania.</param>
         /// <param name="maxGenerations">Maksymalna liczba generacji.</param>
-        public GeneticTSPSolver(double[,] distanceMatrix, int populationSize = 100, double mutationRate = 0.05, double crossoverRate = 0.9, int maxGenerations = 1000)
+        public GeneticTSPSolver(
+            double[,] distanceMatrix,
+            int populationSize = 100,
+            double mutationRate = 0.05,
+            double crossoverRate = 0.9,
+            int maxGenerations = 1000,
+            CrossoverMethodEnum crossoverMethod = CrossoverMethodEnum.PMX
+            )
         {
             this.distanceMatrix = distanceMatrix;
             this.populationSize = populationSize;
@@ -59,6 +75,7 @@ namespace TSP.Console.Solver
             this.crossoverRate = crossoverRate;
             this.maxGenerations = maxGenerations;
             this.numberOfCities = distanceMatrix.GetLength(0);
+            this.CrossoverMethod = crossoverMethod;
         }
 
         /// <summary>
@@ -283,11 +300,14 @@ namespace TSP.Console.Solver
         {
             int[] route = (int[])chromosome.Route.Clone();
             bool improvement = true;
+            int maxIterations = 20; // Maksymalna liczba iteracji
+            int iteration = 0;
 
             double bestDistance = chromosome.Distance;
-            while (improvement)
+            while (improvement && iteration < maxIterations)
             {
                 improvement = false;
+                iteration++;
                 // Przeszukujemy wszystkie trójki krawędzi
                 for (int i = 0; i < numberOfCities - 2; i++)
                 {
