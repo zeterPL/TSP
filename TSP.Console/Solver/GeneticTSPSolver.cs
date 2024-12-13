@@ -109,8 +109,12 @@ namespace TSP.Console.Solver
 
                     if (random.NextDouble() < crossoverRate)
                     {
-                        // Losowanie operatora krzyżowania
-                        offspring = random.Next(2) == 0 ? PMX(parent1, parent2) : OX(parent1, parent2);
+                        offspring = CrossoverMethod switch
+                        {
+                            CrossoverMethodEnum.PMX => PMX(parent1, parent2),
+                            CrossoverMethodEnum.OX => OX(parent1, parent2),
+                            _ => throw new NotImplementedException($"Crossover method {CrossoverMethod.ToString()} not implemented")
+                        };
                     }
                     else
                     {

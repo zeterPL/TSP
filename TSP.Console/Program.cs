@@ -15,8 +15,6 @@ double[,] distanceMatrix = Helpers.CalculateDistanceMatrix(data.Nodes);
 
 //distanceMatrix.PrintMatrix(10);
 
-
-
 GeneticTSPSolver gaSolver = new GeneticTSPSolver(
             distanceMatrix: distanceMatrix,
             populationSize: 100,
