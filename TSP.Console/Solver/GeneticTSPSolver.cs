@@ -50,7 +50,7 @@ namespace TSP.Console.Solver
         /// <summary>
         /// Wybrana metoda krzyżowania
         /// </summary>
-        CrossoverMethodEnum CrossoverMethod { get; set; }
+        public CrossoverMethodEnum CrossoverMethod { get; private set; }
 
         /// <summary>
         /// Inicjalizuje solver algorytmu genetycznego dla TSP.
@@ -87,6 +87,8 @@ namespace TSP.Console.Solver
             List<Chromosome> population = InitializePopulation();
             Chromosome bestSolution = null;
             var stopwatch = new System.Diagnostics.Stopwatch();
+
+            PrintAlgorithmMetrics();
 
             for (int gen = 0; gen < maxGenerations; gen++)
             {
@@ -163,6 +165,24 @@ namespace TSP.Console.Solver
         }
 
         #region Helpers
+
+        public void PrintAlgorithmMetrics()
+        {
+            System.Console.WriteLine("=== Genetic TSP Algorithm ===");
+            System.Console.ForegroundColor = ConsoleColor.Cyan;
+
+            System.Console.WriteLine($"Problem Instance:       berlin52");
+            System.Console.WriteLine($"Number of Cities:       {numberOfCities}");
+            System.Console.WriteLine($"Population Size:        {populationSize}");
+            System.Console.WriteLine($"Max Generations:        {maxGenerations}");
+            System.Console.WriteLine($"Crossover Rate:         {crossoverRate:P}");
+            System.Console.WriteLine($"Mutation Rate:          {mutationRate:P}");
+            System.Console.WriteLine($"Crossover Method:       {CrossoverMethod}");
+
+            System.Console.ResetColor();
+            System.Console.WriteLine("=================================");
+        }
+
 
         /// <summary>
         /// Inicjalizuje populację losowych chromosomów.
