@@ -85,21 +85,23 @@ namespace TSP.Console.Solver
         public Chromosome Solve()
         {
             List<Chromosome> population = InitializePopulation();
-
             Chromosome bestSolution = null;
+            var stopwatch = new System.Diagnostics.Stopwatch();
 
             for (int gen = 0; gen < maxGenerations; gen++)
             {
+                stopwatch.Restart(); // Start measuring time for the generation
                 var currentBest = GetBest(population);
 
                 if (bestSolution == null || currentBest.Distance < bestSolution.Distance)
                 {
                     bestSolution = currentBest;
-                    System.Console.WriteLine($"Generation {gen}, Best Distance: {bestSolution.Distance}");
+                    System.Console.WriteLine($"[Generation {gen}] New Best Distance: {bestSolution.Distance:F2}");
                 }
 
                 var newPopulation = new List<Chromosome>();
 
+                int processedOffspring = 0; // Track progress in the generation
                 while (newPopulation.Count < populationSize)
                 {
                     var parent1 = TournamentSelection(population);
@@ -113,7 +115,7 @@ namespace TSP.Console.Solver
                         {
                             CrossoverMethodEnum.PMX => PMX(parent1, parent2),
                             CrossoverMethodEnum.OX => OX(parent1, parent2),
-                            _ => throw new NotImplementedException($"Crossover method {CrossoverMethod.ToString()} not implemented")
+                            _ => throw new NotImplementedException($"Crossover method {CrossoverMethod} not implemented")
                         };
                     }
                     else
@@ -123,13 +125,21 @@ namespace TSP.Console.Solver
 
                     offspring = Mutate(offspring);
 
-                    // Dodanie lokalnej optymalizacji 3-opt
+                    // Log for the 3-opt process (for every 10th individual)
+                    if (processedOffspring % 10 == 0)
+                    {
+                        System.Console.WriteLine($"  [Generation {gen}] Optimizing offspring {processedOffspring + 1}/{populationSize} with 3-opt...");
+                    }
                     offspring = ThreeOptImprove(offspring);
 
                     newPopulation.Add(offspring);
+                    processedOffspring++;
                 }
 
                 population = newPopulation;
+
+                stopwatch.Stop(); // Measure time for the generation
+                System.Console.WriteLine($"[Generation {gen}] Completed in {stopwatch.ElapsedMilliseconds} ms.");
             }
 
             return bestSolution;
