@@ -93,11 +93,28 @@ namespace TSP.Console.Solver
                 stopwatch.Restart(); // Start measuring time for the generation
                 var currentBest = GetBest(population);
 
+                // Sprawdzenie, czy pojawił się nowy najlepszy wynik
+                bool isNewBest = false;
                 if (bestSolution == null || currentBest.Distance < bestSolution.Distance)
                 {
                     bestSolution = currentBest;
+                    isNewBest = true;
+                }
+
+                // Wyświetlenie logów z kolorami
+                if (isNewBest)
+                {
+                    System.Console.ForegroundColor = ConsoleColor.Green; // Zielony dla nowego najlepszego wyniku
                     System.Console.WriteLine($"[Generation {gen}] New Best Distance: {bestSolution.Distance:F2}");
                 }
+                else
+                {
+                    System.Console.ForegroundColor = ConsoleColor.Red; // Czerwony, jeśli brak poprawy
+                    System.Console.WriteLine($"[Generation {gen}] No improvement. Current Best: {bestSolution.Distance:F2}");
+                }
+
+                // Resetowanie koloru na domyślny
+                System.Console.ResetColor();
 
                 var newPopulation = new List<Chromosome>();
 
@@ -125,7 +142,7 @@ namespace TSP.Console.Solver
 
                     offspring = Mutate(offspring);
 
-                    // Log for the 3-opt process (for every 10th individual)
+                    // Log co 10-tego potomka dla optymalizacji
                     if (processedOffspring % 10 == 0)
                     {
                         System.Console.WriteLine($"  [Generation {gen}] Optimizing offspring {processedOffspring + 1}/{populationSize} with 3-opt...");
