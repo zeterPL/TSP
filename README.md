@@ -26,17 +26,20 @@ Algorytm genetyczny dla problemu komiwojażera
     - Po każdym krzyżowaniu i mutacji, zastosować lokalną optymalizację (np. 2-opt) do poprawienia rozwiązania.
     - Opcjonalnie (dodatkowe punkty): zastąpić 2-opt bardziej zaawansowaną heurystyką (3-opt lub Lin-Kernighan) w algorytmie memetycznym.
 
+- **Generator grafów losowych i porównanie z heurystyką 2-opt**:
+  - Stworzyć generator losowej instancji TSP (losowe położenie miast).
+  - Zaimplementować heurystykę 2-opt.
+
+### Koniecznie do zrobienia
+- - Porównać wyniki GA z wynikami 2-opt na wygenerowanych instancjach.
+
 ### Do zrobienia
 
 - **Dodatkowe operatory krzyżowania**:
 
   - Implementacja trzeciego operatora krzyżowania (np. CX), aby spełnić wymagania i zdobyć dodatkowe punkty.
 
-- **Generator grafów losowych i porównanie z heurystyką 2-opt**:
 
-  - Stworzyć generator losowej instancji TSP (losowe położenie miast).
-  - Zaimplementować heurystykę 2-opt.
-  - Porównać wyniki GA z wynikami 2-opt na wygenerowanych instancjach.
 
 
 
