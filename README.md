@@ -21,6 +21,11 @@ Algorytm genetyczny dla problemu komiwojażera
 - **Implementacja drugiego operatora krzyżowania OX**:
    Krzyżowanie OX, operator wybierany losowo.
 
+
+- **Algorytm memetyczny (lokalna optymalizacja nowych rozwiązań)**: (mamy 3-opt)
+    - Po każdym krzyżowaniu i mutacji, zastosować lokalną optymalizację (np. 2-opt) do poprawienia rozwiązania.
+    - Opcjonalnie (dodatkowe punkty): zastąpić 2-opt bardziej zaawansowaną heurystyką (3-opt lub Lin-Kernighan) w algorytmie memetycznym.
+
 ### Do zrobienia
 
 - **Dodatkowe operatory krzyżowania**:
@@ -33,14 +38,9 @@ Algorytm genetyczny dla problemu komiwojażera
   - Zaimplementować heurystykę 2-opt.
   - Porównać wyniki GA z wynikami 2-opt na wygenerowanych instancjach.
 
-- **Algorytm memetyczny (lokalna optymalizacja nowych rozwiązań)**:
-  - Po każdym krzyżowaniu i mutacji, zastosować lokalną optymalizację (np. 2-opt) do poprawienia rozwiązania.
-  - Opcjonalnie (dodatkowe punkty): zastąpić 2-opt bardziej zaawansowaną heurystyką (3-opt lub Lin-Kernighan) w algorytmie memetycznym.
+
 
 ### Bonusowe
-
-- **3-opt (lokalna optymalizacja)**:  
-  Wprowadzić 3-opt jako ulepszenie w algorytmie memetycznym (+10 pkt).
 
 - **Lin-Kernighan (LK)**:  
   Wprowadzić heurystykę Lin-Kernighan w algorytmie memetycznym (+15 pkt).
