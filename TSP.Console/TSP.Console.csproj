@@ -17,6 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.*" />
+    <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.*" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Input\berlin52.tsp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

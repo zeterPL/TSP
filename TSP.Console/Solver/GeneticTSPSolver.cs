@@ -88,8 +88,6 @@ namespace TSP.Console.Solver
             Chromosome bestSolution = null;
             var stopwatch = new System.Diagnostics.Stopwatch();
 
-            PrintAlgorithmMetrics();
-
             for (int gen = 0; gen < maxGenerations; gen++)
             {
                 stopwatch.Restart(); // Start measuring time for the generation
@@ -169,12 +167,12 @@ namespace TSP.Console.Solver
         /// <summary>
         /// Wypisuje metrukę algorytmu zawietającą informację o parametrach konfiguracyjnych
         /// </summary>
-        public void PrintAlgorithmMetrics()
+        public void PrintAlgorithmMetrics(string problemInstance)
         {
             System.Console.WriteLine("=== Genetic TSP Algorithm ===");
             System.Console.ForegroundColor = ConsoleColor.Cyan;
 
-            System.Console.WriteLine($"Problem Instance:       berlin52");
+            System.Console.WriteLine($"Problem Instance:       {problemInstance}");
             System.Console.WriteLine($"Number of Cities:       {numberOfCities}");
             System.Console.WriteLine($"Population Size:        {populationSize}");
             System.Console.WriteLine($"Max Generations:        {maxGenerations}");
