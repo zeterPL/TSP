@@ -42,8 +42,5 @@ Algorytm genetyczny dla problemu komiwojażera
 
 ### Bonusowe
 
-- **3-opt (lokalna optymalizacja)**:  
-  Wprowadzić 3-opt jako ulepszenie w algorytmie memetycznym (+10 pkt).
-
 - **Lin-Kernighan (LK)**:  
   Wprowadzić heurystykę Lin-Kernighan w algorytmie memetycznym (+15 pkt).
