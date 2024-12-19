@@ -332,7 +332,7 @@ namespace TSP.Console.Solver
         {
             int length = parent1.Route.Length;
             // Build the edge map
-            Dictionary<int, List<int>> edgeMap = new Dictionary<int, List<int>>();
+            Dictionary<int, HashSet<int>> edgeMap = new Dictionary<int, HashSet<int>>();
             BuildEdgeMap(parent1.Route, edgeMap);
             BuildEdgeMap(parent2.Route, edgeMap);
             // Start with a random city
@@ -377,20 +377,20 @@ namespace TSP.Console.Solver
         /// <summary>
         /// Funkcja pomocnicza dla EX (EdgeCrossover)
         /// </summary>
-        private void BuildEdgeMap(int[] route, Dictionary<int, List<int>> edgeMap)
+        private void BuildEdgeMap(int[] route, Dictionary<int, HashSet<int>> edgeMap)
         {
             int length = route.Length;
             for (int i = 0; i < length; i++)
             {
                 int city = route[i];
                 if (!edgeMap.ContainsKey(city))
-                    edgeMap[city] = new List<int>();
+                    edgeMap[city] = new HashSet<int>();
 
                 // Add edges if not already present
                 int prev = route[(i - 1 + length) % length];
                 int next = route[(i + 1) % length];
-                if (!edgeMap[city].Contains(prev)) edgeMap[city].Add(prev);
-                if (!edgeMap[city].Contains(next)) edgeMap[city].Add(next);
+                edgeMap[city].Add(prev);
+                edgeMap[city].Add(next);
             }
         }
 
