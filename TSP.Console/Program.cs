@@ -71,7 +71,13 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
         // Solve TSP using the selected method
         if (solver.ToUpper() == "GA")
         {
-            var crossover = crossoverMethod.ToUpper() == "OX" ? CrossoverMethodEnum.OX : CrossoverMethodEnum.PMX;
+            var crossover = crossoverMethod.ToUpper() switch
+            {
+                "PMX" => CrossoverMethodEnum.PMX,
+                "OX" => CrossoverMethodEnum.OX,
+                "EX" => CrossoverMethodEnum.EX,
+                _ => CrossoverMethodEnum.PMX // Default to PMX if the argument method is not recognized
+            };
             var gaSolver = new GeneticTSPSolver(
                 distanceMatrix: distanceMatrix,
                 populationSize: population,

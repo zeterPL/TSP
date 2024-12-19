@@ -12,6 +12,7 @@ namespace TSP.Console.Common.Enums
     public enum CrossoverMethodEnum
     {
         PMX,
-        OX
+        OX,
+        EX
     }
 }

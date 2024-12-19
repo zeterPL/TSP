@@ -132,6 +132,7 @@ namespace TSP.Console.Solver
                         {
                             CrossoverMethodEnum.PMX => PMX(parent1, parent2),
                             CrossoverMethodEnum.OX => OX(parent1, parent2),
+                            CrossoverMethodEnum.EX => EX(parent1, parent2),
                             _ => throw new NotImplementedException($"Crossover method {CrossoverMethod} not implemented")
                         };
                     }
@@ -322,6 +323,75 @@ namespace TSP.Console.Solver
             }
 
             return new Chromosome(child, distanceMatrix);
+        }
+
+        /// <summary>
+        /// Operator krzyżowania EX (Edge Crossover)
+        /// </summary>
+        private Chromosome EX(Chromosome parent1, Chromosome parent2)
+        {
+            int length = parent1.Route.Length;
+            // Build the edge map
+            Dictionary<int, List<int>> edgeMap = new Dictionary<int, List<int>>();
+            BuildEdgeMap(parent1.Route, edgeMap);
+            BuildEdgeMap(parent2.Route, edgeMap);
+            // Start with a random city
+            Random rnd = new Random();
+            int currentCity = rnd.Next(length);
+            HashSet<int> visited = new HashSet<int>();
+            List<int> childRoute = new List<int>();
+            // Create the child route
+            while (visited.Count < length)
+            {
+                childRoute.Add(currentCity);
+                visited.Add(currentCity);
+                // Remove this city from all adjacency lists
+                if (edgeMap.ContainsKey(currentCity))
+                {
+                    foreach (var key in edgeMap.Keys)
+                    {
+                        edgeMap[key].Remove(currentCity);
+                    }
+                }
+                // Select the next city
+                if (edgeMap.ContainsKey(currentCity) && edgeMap[currentCity].Count > 0)
+                {
+                    currentCity = edgeMap[currentCity].OrderBy(x => edgeMap[x].Count).First();
+                }
+                else
+                {
+                    // Pick an unvisited city randomly
+                    currentCity = visited.Count < length ? Enumerable.Range(0, length).FirstOrDefault(c => !visited.Contains(c)) : -1;
+                    if (currentCity == -1) break; // Safeguard against infinite loop
+                }
+            }
+            // Validate the child route completion
+            if (childRoute.Count < length)
+            {
+                var remainingCities = Enumerable.Range(0, length).Where(c => !visited.Contains(c)).ToList();
+                childRoute.AddRange(remainingCities);
+            }
+            return new Chromosome(childRoute.ToArray(), distanceMatrix);
+        }
+
+        /// <summary>
+        /// Funkcja pomocnicza dla EX (EdgeCrossover)
+        /// </summary>
+        private void BuildEdgeMap(int[] route, Dictionary<int, List<int>> edgeMap)
+        {
+            int length = route.Length;
+            for (int i = 0; i < length; i++)
+            {
+                int city = route[i];
+                if (!edgeMap.ContainsKey(city))
+                    edgeMap[city] = new List<int>();
+
+                // Add edges if not already present
+                int prev = route[(i - 1 + length) % length];
+                int next = route[(i + 1) % length];
+                if (!edgeMap[city].Contains(prev)) edgeMap[city].Add(prev);
+                if (!edgeMap[city].Contains(next)) edgeMap[city].Add(next);
+            }
         }
 
         /// <summary>
