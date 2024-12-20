@@ -204,6 +204,7 @@ namespace TSP.Console.Solver
             System.Console.WriteLine($"Crossover Rate:         {crossoverRate:P}");
             System.Console.WriteLine($"Mutation Rate:          {mutationRate:P}");
             System.Console.WriteLine($"Crossover Method:       {CrossoverMethod}");
+            System.Console.WriteLine($"Heuristic Method:       {HeuristicMethod.ToString()}");
 
             System.Console.ResetColor();
             System.Console.WriteLine("=================================");
@@ -446,63 +447,37 @@ namespace TSP.Console.Solver
         {
             int[] route = (int[])chromosome.Route.Clone();
             bool improvement = true;
-            int maxIterations = 20; // Maksymalna liczba iteracji
+            int maxIterations = 20;
             int iteration = 0;
 
             double bestDistance = chromosome.Distance;
+            var distanceCache = new Dictionary<(int, int), double>();
+
             while (improvement && iteration < maxIterations)
             {
                 improvement = false;
                 iteration++;
-                // Przeszukujemy wszystkie trójki krawędzi
                 for (int i = 0; i < numberOfCities - 2; i++)
                 {
                     for (int j = i + 1; j < numberOfCities - 1; j++)
                     {
                         for (int k = j + 1; k < numberOfCities; k++)
                         {
-                            // Próbujemy wszystkie warianty 3-opt
-                            // Segmenty: (i,j), (j,k)
-                            double oldDist = CalcDistanceOfRouteSegment(route, i, i + 1) +
-                                             CalcDistanceOfRouteSegment(route, j, j + 1) +
-                                             CalcDistanceOfRouteSegment(route, k, (k + 1) % numberOfCities);
+                            double oldDist = GetCachedDistance(distanceCache, route, i, i + 1) +
+                                             GetCachedDistance(distanceCache, route, j, j + 1) +
+                                             GetCachedDistance(distanceCache, route, k, (k + 1) % numberOfCities);
 
-                            // Cztery możliwości 3-opt (skrótowo prezentowane)
-                            // 1) odwrócić segment (i+1 do j)
-                            double gain = Try3OptMove(route, i, j, k, 1);
-                            if (gain < 0)
+                            for (int moveType = 1; moveType <= 4; moveType++)
                             {
-                                bestDistance += gain;
-                                improvement = true;
-                                break;
+                                double gain = Try3OptMove(route, i, j, k, moveType);
+                                if (gain < 0)
+                                {
+                                    bestDistance += gain;
+                                    improvement = true;
+                                    break;
+                                }
                             }
-
-                            // 2) odwrócić segment (j+1 do k)
-                            gain = Try3OptMove(route, i, j, k, 2);
-                            if (gain < 0)
-                            {
-                                bestDistance += gain;
-                                improvement = true;
-                                break;
-                            }
-
-                            // 3) odwrócić oba segmenty
-                            gain = Try3OptMove(route, i, j, k, 3);
-                            if (gain < 0)
-                            {
-                                bestDistance += gain;
-                                improvement = true;
-                                break;
-                            }
-
-                            // 4) inna rekoneksja 3-opt
-                            gain = Try3OptMove(route, i, j, k, 4);
-                            if (gain < 0)
-                            {
-                                bestDistance += gain;
-                                improvement = true;
-                                break;
-                            }
+                            if (improvement) break;
                         }
                         if (improvement) break;
                     }
@@ -510,6 +485,17 @@ namespace TSP.Console.Solver
                 }
             }
             return new Chromosome(route, distanceMatrix);
+        }
+
+        private double GetCachedDistance(Dictionary<(int, int), double> cache, int[] route, int from, int to)
+        {
+            var key = (route[from], route[to]);
+            if (!cache.TryGetValue(key, out var distance))
+            {
+                distance = CalcDistanceOfRouteSegment(route, from, to);
+                cache[key] = distance;
+            }
+            return distance;
         }
 
         /// <summary>
