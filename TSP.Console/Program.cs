@@ -2,6 +2,7 @@
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using TSP.Console.Common.Enums;
+using TSP.Console.Common;
 using TSP.Console.Files;
 using TSP.Console.GraphGenerator;
 using TSP.Console.Solver;
@@ -57,14 +58,14 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
         if (!string.IsNullOrEmpty(inputFile))
         {
             var data = TSPLIBImporter.Import(inputFile);
-            distanceMatrix = Helpers.CalculateDistanceMatrix(data.Nodes);
+            distanceMatrix = Helpers.CalculateDistanceMatrix(data.Nodes, data.EdgeWeightType);
             problemInstance = inputFile;
             Console.WriteLine($"Loaded data from file: {inputFile}");
         }
         else
         {
             var nodes = GraphGenerator.GenerateRandomCities(cities, range);
-            distanceMatrix = Helpers.CalculateDistanceMatrix(nodes);
+            distanceMatrix = Helpers.CalculateDistanceMatrix(nodes, EdgeWeightTypeEnum.EUC_2D);
             Console.WriteLine($"Generated random graph: {cities} cities, coordinate range: {range}");
         }
 
