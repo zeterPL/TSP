@@ -499,55 +499,74 @@ namespace TSP.Console.Solver
         }
 
         /// <summary>
-        /// Oblicza odległość krawędzi między route[pos] a route[nextPos], biorąc pod uwagę wrap-around.
-        /// </summary>
-        private double CalcDistanceOfRouteSegment(int[] route, int posA, int posB)
-        {
-            return distanceMatrix[route[posA], route[posB]];
-        }
-
-        /// <summary>
         /// Przeprowadza próbę zastosowania ruchu 3-opt i zwraca "zysk" (ujemny, jeśli poprawiono).
         /// Parametr moveType określa wariant odwracania segmentów.
         /// </summary>
         private double Try3OptMove(int[] route, int i, int j, int k, int moveType)
         {
-            // Kopia oryginalnej trasy
-            int[] newRoute = (int[])route.Clone();
+            // Oblicz dystans starych krawędzi
+            double oldDist = CalcDistanceOfRouteSegment(route, i, i + 1) +
+                             CalcDistanceOfRouteSegment(route, j, j + 1) +
+                             CalcDistanceOfRouteSegment(route, k, (k + 1) % route.Length);
+
+            // Modyfikujemy trasę zgodnie z typem ruchu
             switch (moveType)
             {
                 case 1:
-                    // Odwracamy segment (i+1, j)
-                    ReverseSegment(newRoute, i + 1, j);
+                    ReverseSegment(route, i + 1, j); // Odwracamy (i+1, j)
                     break;
                 case 2:
-                    // Odwracamy segment (j+1, k)
-                    ReverseSegment(newRoute, j + 1, k);
+                    ReverseSegment(route, j + 1, k); // Odwracamy (j+1, k)
                     break;
                 case 3:
-                    // Odwracamy segment (i+1, j) i (j+1, k)
-                    ReverseSegment(newRoute, i + 1, j);
-                    ReverseSegment(newRoute, j + 1, k);
+                    ReverseSegment(route, i + 1, j); // Odwracamy (i+1, j)
+                    ReverseSegment(route, j + 1, k); // Odwracamy (j+1, k)
                     break;
                 case 4:
-                    // Odwracamy segment (i+1, k)
-                    ReverseSegment(newRoute, i + 1, k);
+                    ReverseSegment(route, i + 1, k); // Odwracamy (i+1, k)
                     break;
                 default:
-                    break;
+                    return 0; // Niepoprawny typ ruchu
             }
 
-            double newDist = CalcTotalDistance(newRoute);
-            double oldDist = CalcTotalDistance(route);
+            // Oblicz dystans nowych krawędzi
+            double newDist = CalcDistanceOfRouteSegment(route, i, i + 1) +
+                             CalcDistanceOfRouteSegment(route, j, j + 1) +
+                             CalcDistanceOfRouteSegment(route, k, (k + 1) % route.Length);
+
             double gain = newDist - oldDist;
 
-            if (gain < 0)
+            // Cofamy zmiany, jeśli nie poprawiono wyniku
+            if (gain >= 0)
             {
-                // Jeśli zysk jest ujemny (czyli lepsza trasa), to aktualizujemy oryginał
-                Array.Copy(newRoute, route, route.Length);
+                // Przywróć pierwotną trasę
+                switch (moveType)
+                {
+                    case 1:
+                        ReverseSegment(route, i + 1, j); // Przywróć (i+1, j)
+                        break;
+                    case 2:
+                        ReverseSegment(route, j + 1, k); // Przywróć (j+1, k)
+                        break;
+                    case 3:
+                        ReverseSegment(route, j + 1, k); // Przywróć (j+1, k)
+                        ReverseSegment(route, i + 1, j); // Przywróć (i+1, j)
+                        break;
+                    case 4:
+                        ReverseSegment(route, i + 1, k); // Przywróć (i+1, k)
+                        break;
+                }
             }
 
             return gain;
+        }
+
+        /// <summary>
+        /// Oblicza dystans dla segmentu między dwoma miastami.
+        /// </summary>
+        private double CalcDistanceOfRouteSegment(int[] route, int start, int end)
+        {
+            return distanceMatrix[route[start], route[end]];
         }
 
         /// <summary>
