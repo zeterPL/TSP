@@ -102,6 +102,12 @@ namespace TSP.Console.Solver
             Chromosome bestSolution = null;
             var stopwatch = new System.Diagnostics.Stopwatch();
 
+            string debugFilePath = "debug_results.txt";
+            if (debug && File.Exists(debugFilePath))
+            {
+                File.Delete(debugFilePath); // Usunięcie starego pliku
+            }
+
             for (int gen = 0; gen < maxGenerations; gen++)
             {
                 stopwatch.Restart(); // Start measuring time for the generation
@@ -128,6 +134,8 @@ namespace TSP.Console.Solver
                         System.Console.ForegroundColor = ConsoleColor.Red; // Czerwony, jeśli brak poprawy
                         System.Console.WriteLine($"[Generation {gen}] No improvement. Current Best: {bestSolution.Distance:F2}");
                     }
+
+                    File.AppendAllText(debugFilePath, $"{currentBest.Distance:F2}\n");
                 }
 
                 // Resetowanie koloru na domyślny
