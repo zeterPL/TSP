@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
+using System.ComponentModel;
 using TSP.Console.Common.Enums;
 using TSP.Console.Files;
 using TSP.Console.GraphGenerator;
@@ -47,13 +48,22 @@ var rootCommand = new RootCommand("Program for solving the Traveling Salesman Pr
     new Option<string>(
         "--heuristic-method", 
         ()  => "LK", 
-        description: "Heuristic method for the Memetic Algorithm (default: LK - Lin–Kernighan).\n")
+        description: "Heuristic method for the Memetic Algorithm (default: LK - Lin–Kernighan).\n"),
+    new Option<bool>(
+        "--debug",
+        () => true,
+        description: "Enable or disable debug output in GeneticTSPSolver.Solve() (default: true).\n"),
+    new Option<bool>(
+        "--compare",
+        () => false,
+        description: "Compare results of 2OPT solver and Genetic Algorithm (default: false).\n")
+
 };
 
 rootCommand.Description = "\nSolving the TSP using a Genetic Algorithm or 2-opt heuristic.\n";
 
-rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, double, double, string, string>(
-    (inputFile, cities, range, solver, population, generations, mutationRate, crossoverRate, crossoverMethod, heuristicMethod) =>
+rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, double, double, string, string, bool, bool>(
+    (inputFile, cities, range, solver, population, generations, mutationRate, crossoverRate, crossoverMethod, heuristicMethod, debug, compare) =>
     {
         // Load or generate graph
         double[,] distanceMatrix;
@@ -73,7 +83,7 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
         }
 
         // Solve TSP using the selected method
-        if (solver.ToUpper() == "GA")
+        void SolveWithGA()
         {
             var crossover = crossoverMethod.ToUpper() switch
             {
@@ -86,8 +96,8 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
             var heuristic = heuristicMethod.ToUpper() switch
             {
                 "LK" => HeuristicMethodEnum.LK,
-                "3-OPT" => HeuristicMethodEnum.OPT3,
-                "2-OPT" => HeuristicMethodEnum.OPT2,
+                "3OPT" => HeuristicMethodEnum.OPT3,
+                "2OPT" => HeuristicMethodEnum.OPT2,
                 _ => HeuristicMethodEnum.LK // Default to LK if the argument heuristic is not recognized
             };
 
@@ -98,7 +108,8 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
                 crossoverRate: crossoverRate,
                 maxGenerations: generations,
                 crossoverMethod: crossover,
-                heuristicMethod: heuristic
+                heuristicMethod: heuristic,
+                debug: debug
             );
 
             gaSolver.PrintAlgorithmMetrics(problemInstance);
@@ -107,15 +118,27 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
             var bestSolution = gaSolver.Solve();
             Console.WriteLine($"Best solution (GA): {bestSolution}");
         }
-        else if (solver.ToUpper() == "2OPT")
+
+        void SolveWith2OPT()
         {
             Console.WriteLine("Solving using the 2-opt heuristic...");
             var twoOptSolution = TwoOptSolver.Solve(distanceMatrix);
             Console.WriteLine($"Best solution (2-opt): {twoOptSolution}");
         }
-        else
+
+        if (compare)
         {
-            Console.WriteLine("Unknown solution method! Use 'GA' or '2OPT'.");
+            Console.WriteLine("\n=== Comparing Algorithms ===");
+            SolveWithGA();
+            SolveWith2OPT(); 
+        } else
+        {
+            if (solver.ToUpper() == "GA")
+                SolveWithGA();
+            else if (solver.ToUpper() == "2OPT")
+                SolveWith2OPT();
+            else
+                Console.WriteLine("Unknown solution method! Use 'GA', '2OPT', or enable '--compare'.");
         }
     });
 

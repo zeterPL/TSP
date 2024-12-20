@@ -58,6 +58,11 @@ namespace TSP.Console.Solver
         public HeuristicMethodEnum HeuristicMethod { get; private set; }
 
         /// <summary>
+        /// Wyświetlaj informacje w Solve() jak np. nr generacji czy czas ukończenia
+        /// </summary>
+        private readonly bool debug;
+
+        /// <summary>
         /// Inicjalizuje solver algorytmu genetycznego dla TSP.
         /// </summary>
         /// <param name="distanceMatrix">Macierz odległości między miastami.</param>
@@ -72,7 +77,8 @@ namespace TSP.Console.Solver
             double crossoverRate = 0.9,
             int maxGenerations = 1000,
             CrossoverMethodEnum crossoverMethod = CrossoverMethodEnum.PMX,
-            HeuristicMethodEnum heuristicMethod = HeuristicMethodEnum.LK
+            HeuristicMethodEnum heuristicMethod = HeuristicMethodEnum.LK,
+            bool debug = true
             )
         {
             this.distanceMatrix = distanceMatrix;
@@ -83,6 +89,7 @@ namespace TSP.Console.Solver
             this.numberOfCities = distanceMatrix.GetLength(0);
             this.CrossoverMethod = crossoverMethod;
             this.HeuristicMethod = heuristicMethod;
+            this.debug = debug;
         }
 
         /// <summary>
@@ -108,16 +115,19 @@ namespace TSP.Console.Solver
                     isNewBest = true;
                 }
 
-                // Wyświetlenie logów z kolorami
-                if (isNewBest)
+                if (debug)
                 {
-                    System.Console.ForegroundColor = ConsoleColor.Green; // Zielony dla nowego najlepszego wyniku
-                    System.Console.WriteLine($"[Generation {gen}] New Best Distance: {bestSolution.Distance:F2}");
-                }
-                else
-                {
-                    System.Console.ForegroundColor = ConsoleColor.Red; // Czerwony, jeśli brak poprawy
-                    System.Console.WriteLine($"[Generation {gen}] No improvement. Current Best: {bestSolution.Distance:F2}");
+                    // Wyświetlenie logów z kolorami
+                    if (isNewBest)
+                    {
+                        System.Console.ForegroundColor = ConsoleColor.Green; // Zielony dla nowego najlepszego wyniku
+                        System.Console.WriteLine($"[Generation {gen}] New Best Distance: {bestSolution.Distance:F2}");
+                    }
+                    else
+                    {
+                        System.Console.ForegroundColor = ConsoleColor.Red; // Czerwony, jeśli brak poprawy
+                        System.Console.WriteLine($"[Generation {gen}] No improvement. Current Best: {bestSolution.Distance:F2}");
+                    }
                 }
 
                 // Resetowanie koloru na domyślny
@@ -170,7 +180,8 @@ namespace TSP.Console.Solver
                 population = newPopulation;
 
                 stopwatch.Stop(); // Measure time for the generation
-                System.Console.WriteLine($"[Generation {gen}] Completed in {stopwatch.ElapsedMilliseconds} ms.");
+                if (debug)
+                    System.Console.WriteLine($"[Generation {gen}] Completed in {stopwatch.ElapsedMilliseconds} ms.");
             }
 
             return bestSolution;
