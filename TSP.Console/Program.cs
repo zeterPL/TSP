@@ -48,7 +48,7 @@ var rootCommand = new RootCommand("Program for solving the Traveling Salesman Pr
     new Option<string>(
         "--heuristic-method", 
         ()  => "LK", 
-        description: "Heuristic method for the Memetic Algorithm (default: LK - Lin–Kernighan).\n"),
+        description: "Heuristic method for the Memetic Algorithm (2OPT or 3OPT).\n"),
     new Option<bool>(
         "--debug",
         () => true,
@@ -93,12 +93,12 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
                 _ => CrossoverMethodEnum.PMX // Default to PMX if the argument method is not recognized
             };
 
-            var heuristic = heuristicMethod.ToUpper() switch
+            HeuristicMethodEnum? heuristic = heuristicMethod.ToUpper() switch
             {
                 "LK" => HeuristicMethodEnum.LK,
                 "3OPT" => HeuristicMethodEnum.OPT3,
                 "2OPT" => HeuristicMethodEnum.OPT2,
-                _ => HeuristicMethodEnum.LK // Default to LK if the argument heuristic is not recognized
+                _ => null
             };
 
             var gaSolver = new GeneticTSPSolver(

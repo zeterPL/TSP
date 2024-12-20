@@ -55,7 +55,7 @@ namespace TSP.Console.Solver
         /// <summary>
         /// Wybrana heurystyka w memetycznym algorytmie
         /// </summary>
-        public HeuristicMethodEnum HeuristicMethod { get; private set; }
+        public HeuristicMethodEnum? HeuristicMethod { get; private set; }
 
         /// <summary>
         /// Wyświetlaj informacje w Solve() jak np. nr generacji czy czas ukończenia
@@ -77,7 +77,7 @@ namespace TSP.Console.Solver
             double crossoverRate = 0.9,
             int maxGenerations = 1000,
             CrossoverMethodEnum crossoverMethod = CrossoverMethodEnum.PMX,
-            HeuristicMethodEnum heuristicMethod = HeuristicMethodEnum.LK,
+            HeuristicMethodEnum? heuristicMethod = HeuristicMethodEnum.LK,
             bool debug = true
             )
         {
@@ -168,7 +168,7 @@ namespace TSP.Console.Solver
 
                     offspring = HeuristicMethod switch
                     {
-                        HeuristicMethodEnum.LK => Improve(offspring),
+                        HeuristicMethodEnum.OPT2 => TwoOptImprove(offspring),
                         HeuristicMethodEnum.OPT3 => ThreeOptImprove(offspring),
                         _ => offspring
                     };
@@ -593,7 +593,11 @@ namespace TSP.Console.Solver
             return dist;
         }
 
-        private Chromosome Improve(Chromosome chromosome)
+
+        /// <summary>
+        /// Improves a TSP solution using the Kernighan–Lin heuristic.
+        /// </summary>
+        private Chromosome TwoOptImprove(Chromosome chromosome)
         {
             int[] route = (int[])chromosome.Route.Clone();
             double bestDistance = chromosome.Distance;
@@ -602,89 +606,42 @@ namespace TSP.Console.Solver
             while (improvement)
             {
                 improvement = false;
-
-                // Step 1: Select an initial edge (t1, t2)
-                for (int t1 = 0; t1 < numberOfCities - 1; t1++)
+                // Iterate through all possible pairs of edges
+                for (int i = 0; i < numberOfCities - 1; i++)
                 {
-                    int t2 = (t1 + 1) % numberOfCities;
-
-                    // Step 2: Explore potential edge replacements
-                    for (int t3 = 0; t3 < numberOfCities; t3++)
+                    for (int j = i + 2; j < numberOfCities; j++)
                     {
-                        if (t3 == t1 || t3 == t2) continue;
+                        // Ensure edges don't overlap (no wrap-around issues)
+                        if (i == 0 && j == numberOfCities - 1) continue;
 
-                        int t4 = (t3 + 1) % numberOfCities;
-
-                        // Calculate gain for replacing edges (t1, t2) and (t3, t4)
-                        double gain = CalculateLKGain(route, t1, t2, t3, t4);
-                        if (gain > 0) // Perform the swap if it improves the solution
+                        // Calculate the change in distance if we swap edges (i, i+1) and (j, j+1)
+                        double delta = CalculateSwapGain(route, i, j);
+                        if (delta < 0) // Only perform the swap if it improves the distance
                         {
-                            ReverseSegment(route, t2, t3);
-                            bestDistance -= gain;
+                            ReverseSegment(route, i + 1, j);
+                            bestDistance += delta;
                             improvement = true;
                         }
                     }
                 }
             }
-
             return new Chromosome(route, distanceMatrix);
         }
 
-        private double CalculateLKGain(int[] route, int t1, int t2, int t3, int t4)
+        /// <summary>
+        /// Calculates the gain (change in distance) for swapping edges.
+        /// </summary>
+        private double CalculateSwapGain(int[] route, int i, int j)
         {
-            double currentCost = distanceMatrix[route[t1], route[t2]] + distanceMatrix[route[t3], route[t4]];
-            double newCost = distanceMatrix[route[t1], route[t3]] + distanceMatrix[route[t2], route[t4]];
-            return currentCost - newCost;
+            int a = route[i];
+            int b = route[i + 1];
+            int c = route[j];
+            int d = route[(j + 1) % numberOfCities];
+            // Calculate the difference in edge lengths
+            double currentCost = distanceMatrix[a, b] + distanceMatrix[c, d];
+            double newCost = distanceMatrix[a, c] + distanceMatrix[b, d];
+            return newCost - currentCost;
         }
-
-        ///// <summary>
-        ///// Improves a TSP solution using the Kernighan–Lin heuristic.
-        ///// </summary>
-        //private Chromosome Improve(Chromosome chromosome)
-        //{
-        //    int[] route = (int[])chromosome.Route.Clone();
-        //    double bestDistance = chromosome.Distance;
-        //    bool improvement = true;
-
-        //    while (improvement)
-        //    {
-        //        improvement = false;
-        //        // Iterate through all possible pairs of edges
-        //        for (int i = 0; i < numberOfCities - 1; i++)
-        //        {
-        //            for (int j = i + 2; j < numberOfCities; j++)
-        //            {
-        //                // Ensure edges don't overlap (no wrap-around issues)
-        //                if (i == 0 && j == numberOfCities - 1) continue;
-
-        //                // Calculate the change in distance if we swap edges (i, i+1) and (j, j+1)
-        //                double delta = CalculateSwapGain(route, i, j);
-        //                if (delta < 0) // Only perform the swap if it improves the distance
-        //                {
-        //                    ReverseSegment(route, i + 1, j);
-        //                    bestDistance += delta;
-        //                    improvement = true;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return new Chromosome(route, distanceMatrix);
-        //}
-
-        ///// <summary>
-        ///// Calculates the gain (change in distance) for swapping edges.
-        ///// </summary>
-        //private double CalculateSwapGain(int[] route, int i, int j)
-        //{
-        //    int a = route[i];
-        //    int b = route[i + 1];
-        //    int c = route[j];
-        //    int d = route[(j + 1) % numberOfCities];
-        //    // Calculate the difference in edge lengths
-        //    double currentCost = distanceMatrix[a, b] + distanceMatrix[c, d];
-        //    double newCost = distanceMatrix[a, c] + distanceMatrix[b, d];
-        //    return newCost - currentCost;
-        //}
         #endregion
     }
 }
