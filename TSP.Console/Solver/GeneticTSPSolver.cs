@@ -51,6 +51,11 @@ namespace TSP.Console.Solver
         /// Wybrana metoda krzyżowania
         /// </summary>
         public CrossoverMethodEnum CrossoverMethod { get; private set; }
+        
+        /// <summary>
+        /// Wybrana heurystyka w memetycznym algorytmie
+        /// </summary>
+        public HeuristicMethodEnum HeuristicMethod { get; private set; }
 
         /// <summary>
         /// Inicjalizuje solver algorytmu genetycznego dla TSP.
@@ -66,7 +71,8 @@ namespace TSP.Console.Solver
             double mutationRate = 0.05,
             double crossoverRate = 0.9,
             int maxGenerations = 1000,
-            CrossoverMethodEnum crossoverMethod = CrossoverMethodEnum.PMX
+            CrossoverMethodEnum crossoverMethod = CrossoverMethodEnum.PMX,
+            HeuristicMethodEnum heuristicMethod = HeuristicMethodEnum.LK
             )
         {
             this.distanceMatrix = distanceMatrix;
@@ -76,6 +82,7 @@ namespace TSP.Console.Solver
             this.maxGenerations = maxGenerations;
             this.numberOfCities = distanceMatrix.GetLength(0);
             this.CrossoverMethod = crossoverMethod;
+            this.HeuristicMethod = heuristicMethod;
         }
 
         /// <summary>
@@ -148,8 +155,13 @@ namespace TSP.Console.Solver
                     //{
                     //    System.Console.WriteLine($"  [Generation {gen}] Optimizing offspring {processedOffspring + 1}/{populationSize} with 3-opt...");
                     //}
-                    offspring = KernighanLinImprove(offspring);
-                    //offspring = ThreeOptImprove(offspring);
+
+                    offspring = HeuristicMethod switch
+                    {
+                        HeuristicMethodEnum.LK => LinKernighanImprove(offspring),
+                        HeuristicMethodEnum.OPT3 => ThreeOptImprove(offspring),
+                        _ => offspring
+                    };
 
                     newPopulation.Add(offspring);
                     processedOffspring++;
@@ -574,7 +586,7 @@ namespace TSP.Console.Solver
         /// <summary>
         /// Improves a TSP solution using the Kernighan–Lin heuristic.
         /// </summary>
-        private Chromosome KernighanLinImprove(Chromosome chromosome)
+        private Chromosome LinKernighanImprove(Chromosome chromosome)
         {
             int[] route = (int[])chromosome.Route.Clone();
             double bestDistance = chromosome.Distance;

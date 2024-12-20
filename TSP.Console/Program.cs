@@ -2,7 +2,6 @@
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using TSP.Console.Common.Enums;
-using TSP.Console.Common;
 using TSP.Console.Files;
 using TSP.Console.GraphGenerator;
 using TSP.Console.Solver;
@@ -44,13 +43,17 @@ var rootCommand = new RootCommand("Program for solving the Traveling Salesman Pr
     new Option<string>(
         "--crossover-method",
         () => "PMX",
-        description: "\nCrossover method: 'PMX' (Partially Mapped Crossover) or 'OX' (Order Crossover).\n")
+        description: "\nCrossover method: 'PMX' (Partially Mapped Crossover) or 'OX' (Order Crossover).\n"),
+    new Option<string>(
+        "--heuristic-method", 
+        ()  => "LK", 
+        description: "Heuristic method for the Memetic Algorithm (default: LK - Lin–Kernighan).\n")
 };
 
 rootCommand.Description = "\nSolving the TSP using a Genetic Algorithm or 2-opt heuristic.\n";
 
-rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, double, double, string>(
-    (inputFile, cities, range, solver, population, generations, mutationRate, crossoverRate, crossoverMethod) =>
+rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, double, double, string, string>(
+    (inputFile, cities, range, solver, population, generations, mutationRate, crossoverRate, crossoverMethod, heuristicMethod) =>
     {
         // Load or generate graph
         double[,] distanceMatrix;
@@ -79,13 +82,23 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
                 "EX" => CrossoverMethodEnum.EX,
                 _ => CrossoverMethodEnum.PMX // Default to PMX if the argument method is not recognized
             };
+
+            var heuristic = heuristicMethod.ToUpper() switch
+            {
+                "LK" => HeuristicMethodEnum.LK,
+                "3-OPT" => HeuristicMethodEnum.OPT3,
+                "2-OPT" => HeuristicMethodEnum.OPT2,
+                _ => HeuristicMethodEnum.LK // Default to LK if the argument heuristic is not recognized
+            };
+
             var gaSolver = new GeneticTSPSolver(
                 distanceMatrix: distanceMatrix,
                 populationSize: population,
                 mutationRate: mutationRate,
                 crossoverRate: crossoverRate,
                 maxGenerations: generations,
-                crossoverMethod: crossover
+                crossoverMethod: crossover,
+                heuristicMethod: heuristic
             );
 
             gaSolver.PrintAlgorithmMetrics(problemInstance);

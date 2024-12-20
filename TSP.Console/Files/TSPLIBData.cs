@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TSP.Console.Common;
+using TSP.Console.Common.Enums;
 using TSP.Console.Files.Importer;
 
 namespace TSP.Console.Files

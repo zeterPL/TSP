@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TSP.Console.Common
+namespace TSP.Console.Common.Enums
 {
     public enum EdgeWeightTypeEnum
     {

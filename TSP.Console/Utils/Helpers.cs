@@ -1,5 +1,5 @@
 ﻿
-using TSP.Console.Common;
+using TSP.Console.Common.Enums;
 using TSP.Console.Files.Importer;
 
 namespace TSP.Console.TSPSolver

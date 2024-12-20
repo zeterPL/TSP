@@ -1,4 +1,4 @@
-﻿using TSP.Console.Common;
+﻿using TSP.Console.Common.Enums;
 using TSP.Console.Common.Exceptions;
 using TSP.Console.Files.Importer;
 
