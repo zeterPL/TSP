@@ -46,8 +46,8 @@ var rootCommand = new RootCommand("Program for solving the Traveling Salesman Pr
         () => "PMX",
         description: "\nCrossover method: 'PMX' (Partially Mapped Crossover) or 'OX' (Order Crossover).\n"),
     new Option<string>(
-        "--heuristic-method", 
-        ()  => "LK", 
+        "--heuristic-method",
+        ()  => "LK",
         description: "Heuristic method for the Memetic Algorithm (2OPT or 3OPT).\n"),
     new Option<bool>(
         "--debug",
@@ -56,14 +56,17 @@ var rootCommand = new RootCommand("Program for solving the Traveling Salesman Pr
     new Option<bool>(
         "--compare",
         () => false,
-        description: "Compare results of 2OPT solver and Genetic Algorithm (default: false).\n")
-
+        description: "Compare results of 2OPT solver and Genetic Algorithm (default: false).\n"),
+    new Option<int>(
+        "--runs",
+        () => 0,
+        description: "\nNumber of runs for averaging results.\n")
 };
 
 rootCommand.Description = "\nSolving the TSP using a Genetic Algorithm or 2-opt heuristic.\n";
 
-rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, double, double, string, string, bool, bool>(
-    (inputFile, cities, range, solver, population, generations, mutationRate, crossoverRate, crossoverMethod, heuristicMethod, debug, compare) =>
+rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, double, double, string, string, bool, bool, int>(
+    (inputFile, cities, range, solver, population, generations, mutationRate, crossoverRate, crossoverMethod, heuristicMethod, debug, compare, runs) =>
     {
         // Load or generate graph
         double[,] distanceMatrix;
@@ -126,12 +129,74 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
             Console.WriteLine($"Best solution (2-opt): {twoOptSolution}");
         }
 
-        if (compare)
+        void ExecuteMultipleRuns(string solver, int runs, double[,] distanceMatrix)
+        {
+            var bestResults = new List<double>();
+
+            var crossover = crossoverMethod.ToUpper() switch
+            {
+                "PMX" => CrossoverMethodEnum.PMX,
+                "OX" => CrossoverMethodEnum.OX,
+                "EX" => CrossoverMethodEnum.EX,
+                _ => CrossoverMethodEnum.PMX // Default to PMX if the argument method is not recognized
+            };
+
+            HeuristicMethodEnum? heuristic = heuristicMethod.ToUpper() switch
+            {
+                "LK" => HeuristicMethodEnum.LK,
+                "3OPT" => HeuristicMethodEnum.OPT3,
+                "2OPT" => HeuristicMethodEnum.OPT2,
+                _ => null
+            };
+
+
+            for (int i = 0; i < runs; i++)
+            {
+                Chromosome solution;
+                if (solver.ToUpper() == "GA")
+                {
+                    var gaSolver = new GeneticTSPSolver(
+                        distanceMatrix: distanceMatrix,
+                        populationSize: population,
+                        mutationRate: mutationRate,
+                        crossoverRate: crossoverRate,
+                        maxGenerations: generations,
+                        crossoverMethod: crossover,
+                        heuristicMethod: heuristic,
+                        debug: debug
+                    );
+                    solution = gaSolver.Solve();
+                }
+                else if (solver.ToUpper() == "2OPT")
+                {
+                    solution = TwoOptSolver.Solve(distanceMatrix);
+                }
+                else
+                {
+                    Console.WriteLine("Unknown solver method!");
+                    return;
+                }
+
+                bestResults.Add(solution.Distance);
+                Console.WriteLine($"Run {i + 1}/{runs}: Best Distance = {solution.Distance:F2}");
+            }
+
+            Console.WriteLine("\n=== Summary ===");
+            Console.WriteLine($"Average Best Distance: {bestResults.Average():F2}");
+        }
+
+
+        if (runs > 1)
+        {
+            ExecuteMultipleRuns(solver, runs, distanceMatrix);
+        }
+        else if (compare)
         {
             Console.WriteLine("\n=== Comparing Algorithms ===");
             SolveWithGA();
-            SolveWith2OPT(); 
-        } else
+            SolveWith2OPT();
+        }
+        else
         {
             if (solver.ToUpper() == "GA")
                 SolveWithGA();
