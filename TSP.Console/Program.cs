@@ -2,6 +2,7 @@
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using System.ComponentModel;
+using System.Linq;
 using TSP.Console.Common.Enums;
 using TSP.Console.Files;
 using TSP.Console.GraphGenerator;
@@ -132,6 +133,7 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
         void ExecuteMultipleRuns(string solver, int runs, double[,] distanceMatrix)
         {
             var bestResults = new List<double>();
+            var bestResults2OPT = new List<double>();
 
             var crossover = crossoverMethod.ToUpper() switch
             {
@@ -153,7 +155,30 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
             for (int i = 0; i < runs; i++)
             {
                 Chromosome solution;
-                if (solver.ToUpper() == "GA")
+                Chromosome solution2OPT;
+
+                if (compare)
+                {
+                    var gaSolver = new GeneticTSPSolver(
+                      distanceMatrix: distanceMatrix,
+                      populationSize: population,
+                      mutationRate: mutationRate,
+                      crossoverRate: crossoverRate,
+                      maxGenerations: generations,
+                      crossoverMethod: crossover,
+                      heuristicMethod: heuristic,
+                      debug: debug
+                  );
+                    solution = gaSolver.Solve();
+
+                    solution2OPT = TwoOptSolver.Solve(distanceMatrix);
+
+                    bestResults.Add(solution.Distance);
+                    bestResults2OPT.Add(solution2OPT.Distance);
+                    Console.WriteLine($"Run {i + 1}/{runs}: Best Distance 2OPT = {solution2OPT.Distance:F2}");
+
+                }
+                else if (solver.ToUpper() == "GA")
                 {
                     var gaSolver = new GeneticTSPSolver(
                         distanceMatrix: distanceMatrix,
@@ -179,10 +204,12 @@ rootCommand.Handler = CommandHandler.Create<string, int, int, string, int, int, 
 
                 bestResults.Add(solution.Distance);
                 Console.WriteLine($"Run {i + 1}/{runs}: Best Distance = {solution.Distance:F2}");
+             
             }
 
             Console.WriteLine("\n=== Summary ===");
             Console.WriteLine($"Average Best Distance: {bestResults.Average():F2}");
+            if(compare) Console.WriteLine($"Average Best Distance for 2OPT: {bestResults2OPT.Average():F2}");
         }
 
 
